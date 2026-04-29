@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Was gehört in die Schultasche?</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Baloo 2', 'Arial Rounded MT Bold', Arial, sans-serif;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 28px;
+  box-shadow: 0 6px 32px rgba(0,60,140,0.14), 0 2px 8px rgba(0,0,0,0.07);
+  width: 500px;
+  max-width: 98vw;
+  overflow: hidden;
+  border: 2.5px solid #cce4f8;
+}
+
+/* ── Header strip ── */
+.card-header {
+  background: #1a4e8c;
+  color: white;
+  padding: 0.65rem 1.5rem;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  text-align: center;
+}
+
+/* ── Character area ── */
+.koko-stage {
+  background: linear-gradient(180deg, #daeefa 0%, #f0f8ff 100%);
+  padding: 1rem 1rem 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 130px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grass strip */
+.koko-stage::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 22px;
+  background: #5ab52a;
+  border-radius: 0;
+}
+
+/* Kokosnuss SVG wrapper */
+#koko-wrap {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 4px;
+  animation: koko-idle 2.4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+@keyframes koko-idle {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  30%      { transform: translateY(-6px) rotate(1deg); }
+  60%      { transform: translateY(-3px) rotate(-1deg); }
+}
+#koko-wrap.koko-happy {
+  animation: koko-jump 0.6s ease-out forwards;
+}
+@keyframes koko-jump {
+  0%   { transform: translateY(0) scale(1); }
+  30%  { transform: translateY(-22px) scale(1.1) rotate(-4deg); }
+  55%  { transform: translateY(-28px) scale(1.12) rotate(4deg); }
+  80%  { transform: translateY(-8px) scale(1.05); }
+  100% { transform: translateY(0) scale(1); }
+}
+#koko-wrap.koko-wrong {
+  animation: koko-shake 0.55s ease-in-out forwards;
+}
+@keyframes koko-shake {
+  0%,100% { transform: translateX(0) rotate(0deg); }
+  15%     { transform: translateX(-10px) rotate(-5deg); }
+  35%     { transform: translateX(10px) rotate(5deg); }
+  55%     { transform: translateX(-7px) rotate(-3deg); }
+  75%     { transform: translateX(7px) rotate(3deg); }
+}
+#koko-wrap.koko-celebrate {
+  animation: koko-celebrate 1s ease-in-out infinite;
+}
+@keyframes koko-celebrate {
+  0%,100% { transform: translateY(0) scale(1) rotate(0deg); }
+  25%     { transform: translateY(-18px) scale(1.12) rotate(-6deg); }
+  75%     { transform: translateY(-12px) scale(1.08) rotate(6deg); }
+}
+
+/* Sparkles */
+.spark {
+  position: absolute;
+  width: 10px; height: 10px;
+  background: #FFD700;
+  clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.spark.go {
+  animation: spark-fly 0.7s ease-out forwards;
+}
+@keyframes spark-fly {
+  0%   { opacity:1; transform:scale(0.4) translate(0,0); }
+  60%  { opacity:1; }
+  100% { opacity:0; transform:scale(1.2) translate(var(--dx),var(--dy)); }
+}
+
+/* ── Quiz body ── */
+.quiz-body {
+  padding: 1.25rem 2rem 1.5rem;
+  text-align: center;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.1rem;
+}
+.dot {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: #c8e4f8;
+  transition: background 0.3s, transform 0.2s;
+}
+.dot.done   { background: #3aaa3a; }
+.dot.active { background: #1a4e8c; transform: scale(1.35); }
+
+.item-emoji {
+  font-size: 78px;
+  line-height: 1;
+  display: block;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.10));
+}
+.item-article {
+  font-size: 16px;
+  font-weight: 600;
+  color: #c0392b;
+}
+.item-word {
+  font-size: 30px;
+  font-weight: 800;
+  color: #1a3a6e;
+  letter-spacing: -0.3px;
+  margin-bottom: 0.9rem;
+}
+
+.question-box {
+  background: #e8f2ff;
+  border-radius: 12px;
+  padding: 0.45rem 1.2rem;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a4e8c;
+  display: inline-block;
+  margin-bottom: 1.1rem;
+}
+
+.btn-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+.btn-ja, .btn-nein {
+  font-family: 'Baloo 2', Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  border: none;
+  padding: 0.6rem 0;
+  border-radius: 14px;
+  cursor: pointer;
+  width: 130px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.16);
+  transition: transform 0.1s, filter 0.1s;
+}
+.btn-ja   { background: #2aaa42; color: #fff; }
+.btn-nein { background: #d93030; color: #fff; }
+.btn-ja:hover   { filter: brightness(1.09); }
+.btn-nein:hover { filter: brightness(1.09); }
+.btn-ja:active, .btn-nein:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.16);
+}
+.btn-ja:disabled, .btn-nein:disabled { opacity: 0.38; cursor: default; transform: none; }
+
+.feedback { min-height: 60px; margin-top: 0.9rem; }
+.fb-ok    { color: #1e7a32; font-size: 19px; font-weight: 800; margin-bottom: 5px; }
+.fb-wrong { color: #b02020; font-size: 19px; font-weight: 800; margin-bottom: 5px; }
+.fb-tag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.fb-yes { background: #d4f0dc; color: #1a6e30; }
+.fb-no  { background: #fad8d8; color: #8a1a1a; }
+
+.btn-next {
+  font-family: 'Baloo 2', Arial, sans-serif;
+  background: #1a4e8c;
+  color: #fff;
+  border: none;
+  padding: 0.48rem 1.6rem;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 11px;
+  cursor: pointer;
+  margin-top: 2px;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.14);
+}
+.btn-next:hover { filter: brightness(1.12); }
+
+/* ── Footer score ── */
+.card-footer {
+  background: #f0f7ff;
+  border-top: 1.5px solid #cce4f8;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a4e8c;
+  min-height: 36px;
+}
+
+/* ── End screen ── */
+.end-emoji { font-size: 72px; margin-bottom: 8px; display: block; }
+.end-title { font-size: 30px; font-weight: 800; color: #1a3a6e; }
+.end-stars { font-size: 26px; letter-spacing: 3px; margin: 0.4rem 0 0.8rem; }
+.end-sub   { font-size: 15px; color: #2a5080; margin-bottom: 1.25rem; }
+.btn-restart {
+  font-family: 'Baloo 2', Arial, sans-serif;
+  background: #2aaa42;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.8rem;
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.14);
+}
+.btn-restart:hover { filter: brightness(1.1); }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="card-header">🎒 Was gehört in die Schultasche?</div>
+
+  <!-- Character stage -->
+  <div class="koko-stage">
+    <!-- Sparkle elements -->
+    <div class="spark" id="sp1" style="left:35%;top:20%;--dx:-30px;--dy:-40px;"></div>
+    <div class="spark" id="sp2" style="left:55%;top:15%;--dx:28px;--dy:-38px;width:8px;height:8px;"></div>
+    <div class="spark" id="sp3" style="left:65%;top:28%;--dx:35px;--dy:-25px;width:7px;height:7px;background:#ff6eb4;"></div>
+    <div class="spark" id="sp4" style="left:25%;top:30%;--dx:-28px;--dy:-20px;width:8px;height:8px;background:#5fe05f;"></div>
+
+    <div id="koko-wrap">
+      <svg id="koko-svg" viewBox="0 0 110 145" width="88" height="116" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- Back spikes -->
+        <polygon points="14,78 6,52 24,70" fill="#3aaa3a"/>
+        <polygon points="22,66 16,38 34,58" fill="#4bbf4b"/>
+        <polygon points="32,57 28,28 44,52" fill="#3aaa3a"/>
+        <polygon points="44,52 42,22 56,48" fill="#4bbf4b"/>
+
+        <!-- Wings -->
+        <ellipse cx="8" cy="98" rx="16" ry="10" fill="#9b8ee0" transform="rotate(-25,8,98)"/>
+        <ellipse cx="102" cy="98" rx="16" ry="10" fill="#9b8ee0" transform="rotate(25,102,98)"/>
+        <ellipse cx="8" cy="98" rx="10" ry="7" fill="#b8aff0" transform="rotate(-25,8,98)"/>
+        <ellipse cx="102" cy="98" rx="10" ry="7" fill="#b8aff0" transform="rotate(25,102,98)"/>
+
+        <!-- Body -->
+        <ellipse cx="55" cy="100" rx="37" ry="40" fill="#e84410"/>
+
+        <!-- Belly -->
+        <ellipse cx="55" cy="108" rx="22" ry="26" fill="#f5a050"/>
+
+        <!-- Neck -->
+        <ellipse cx="55" cy="65" rx="20" ry="14" fill="#e84410"/>
+
+        <!-- Head -->
+        <circle cx="55" cy="44" r="31" fill="#e84410"/>
+
+        <!-- Cap brim -->
+        <ellipse cx="55" cy="17" rx="27" ry="7" fill="#1e6cd4"/>
+        <!-- Cap body -->
+        <rect x="38" y="8" width="34" height="12" fill="#1a5bbf" rx="4"/>
+        <!-- Cap button top -->
+        <circle cx="55" cy="8" r="5" fill="#174fa8"/>
+        <!-- Cap flap/tuft -->
+        <ellipse cx="55" cy="6" rx="4" ry="6" fill="#1e6cd4"/>
+        <circle cx="55" cy="2" r="3" fill="#ffd700"/>
+
+        <!-- Ears/head spikes -->
+        <polygon points="28,24 20,8 36,18" fill="#4bbf4b"/>
+        <polygon points="82,24 90,8 74,18" fill="#4bbf4b"/>
+
+        <!-- Eyes white -->
+        <circle cx="43" cy="42" r="10" fill="white"/>
+        <circle cx="67" cy="42" r="10" fill="white"/>
+        <!-- Pupils -->
+        <circle id="pupL" cx="44" cy="43" r="6" fill="#1a1a1a"/>
+        <circle id="pupR" cx="68" cy="43" r="6" fill="#1a1a1a"/>
+        <!-- Eye shine -->
+        <circle cx="46" cy="41" r="2.5" fill="white"/>
+        <circle cx="70" cy="41" r="2.5" fill="white"/>
+
+        <!-- Mouth (happy default) -->
+        <path id="mouth" d="M 44 58 Q 55 68 66 58" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+        <!-- Nose dots -->
+        <circle cx="51" cy="52" r="2" fill="#c03a0a"/>
+        <circle cx="59" cy="52" r="2" fill="#c03a0a"/>
+
+        <!-- Arms -->
+        <ellipse cx="16" cy="112" rx="10" ry="16" fill="#e84410" transform="rotate(18,16,112)"/>
+        <ellipse cx="94" cy="112" rx="10" ry="16" fill="#e84410" transform="rotate(-18,94,112)"/>
+        <!-- Hand claws -->
+        <circle cx="10" cy="123" r="5" fill="#e84410"/>
+        <circle cx="98" cy="123" r="5" fill="#e84410"/>
+
+        <!-- Feet -->
+        <ellipse cx="40" cy="138" rx="14" ry="9" fill="#c83a0a"/>
+        <ellipse cx="70" cy="138" rx="14" ry="9" fill="#c83a0a"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Quiz content -->
+  <div class="quiz-body" id="quiz-body"></div>
+
+  <!-- Score footer -->
+  <div class="card-footer" id="card-footer"></div>
+
+</div>
+
+<script>
+const rawItems = [
+  { e:'✏️', a:'der', w:'Stift',        r:true  },
+  { e:'📓', a:'das', w:'Heft',         r:true  },
+  { e:'📖', a:'das', w:'Buch',         r:true  },
+  { e:'✂️', a:'die', w:'Schere',       r:true  },
+  { e:'📏', a:'das', w:'Lineal',       r:true  },
+  { e:'🖍️', a:'die', w:'Buntstifte',  r:true  },
+  { e:'📐', a:'das', w:'Geodreieck',   r:true  },
+  { e:'🥥', a:'die', w:'Kokosnuss',    r:false },
+  { e:'🐍', a:'die', w:'Schlange',     r:false },
+  { e:'🍕', a:'die', w:'Pizza',        r:false },
+  { e:'🐘', a:'der', w:'Elefant',      r:false },
+  { e:'🛟', a:'der', w:'Schwimmring',  r:false }
+];
+
+let items=[], cur=0, score=0, busy=false;
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} }
+
+function setMouth(type){
+  const m=document.getElementById('mouth');
+  if(type==='happy') m.setAttribute('d','M 44 58 Q 55 68 66 58');
+  else if(type==='sad') m.setAttribute('d','M 44 64 Q 55 55 66 64');
+  else if(type==='wow') m.setAttribute('d','M 46 56 Q 55 70 64 56');
+}
+
+function kokoAnim(type){
+  const w=document.getElementById('koko-wrap');
+  w.className='';
+  void w.offsetWidth;
+  if(type==='happy'){
+    w.classList.add('koko-happy');
+    setMouth('happy');
+    sparkle();
+    setTimeout(()=>{ w.className=''; setMouth('happy'); },700);
+  } else if(type==='wrong'){
+    w.classList.add('koko-wrong');
+    setMouth('sad');
+    setTimeout(()=>{ w.className=''; },650);
+  } else if(type==='celebrate'){
+    w.classList.add('koko-celebrate');
+    setMouth('wow');
+    sparkle(); setTimeout(sparkle,400); setTimeout(sparkle,800);
+  }
+}
+
+function sparkle(){
+  ['sp1','sp2','sp3','sp4'].forEach(id=>{
+    const s=document.getElementById(id);
+    s.classList.remove('go');
+    void s.offsetWidth;
+    s.classList.add('go');
+  });
+}
+
+function dots(){
+  return `<div class="dots">${items.map((_,i)=>`<span class="dot ${i<cur?'done':i===cur?'active':''}"></span>`).join('')}</div>`;
+}
+
+function render(){
+  const body=document.getElementById('quiz-body');
+  const foot=document.getElementById('card-footer');
+  if(cur>=items.length){ showEnd(); return; }
+  foot.textContent = cur>0 ? `${score} von ${cur} richtig` : '';
+  const it=items[cur];
+  body.innerHTML=`
+    ${dots()}
+    <span class="item-emoji">${it.e}</span>
+    <div class="item-article">${it.a}</div>
+    <div class="item-word">${it.w}</div>
+    <div><span class="question-box">Gehört das in die Schultasche?</span></div>
+    <div class="btn-row">
+      <button class="btn-ja" id="bja" onclick="answer(true)">✓ Ja</button>
+      <button class="btn-nein" id="bnein" onclick="answer(false)">✗ Nein</button>
+    </div>
+    <div class="feedback" id="fb"></div>
+  `;
+  setMouth('happy');
+  busy=false;
+}
+
+function answer(yes){
+  if(busy)return; busy=true;
+  const it=items[cur];
+  const ok=(yes===it.r);
+  if(ok) score++;
+  document.getElementById('bja').disabled=true;
+  document.getElementById('bnein').disabled=true;
+  document.getElementById('bja').style.opacity=(ok&&yes)?'1':'0.35';
+  document.getElementById('bnein').style.opacity=(ok&&!yes)?'1':'0.35';
+  kokoAnim(ok?'happy':'wrong');
+  const fb=document.getElementById('fb');
+  const tagCls=it.r?'fb-yes':'fb-no';
+  const tagTxt=it.r?'Ja, gehört rein! ✓':'Nein, gehört nicht rein! ✗';
+  fb.innerHTML=`
+    <div class="${ok?'fb-ok':'fb-wrong'}">${ok?'Super! 🌟':'Nicht ganz!'}</div>
+    <span class="fb-tag ${tagCls}">${tagTxt}</span><br>
+    <button class="btn-next" onclick="next()">${cur<items.length-1?'Weiter →':'Ergebnis 🏆'}</button>
+  `;
+  document.getElementById('card-footer').textContent=`${score} von ${cur+1} richtig`;
+}
+
+function next(){ cur++; render(); }
+
+function showEnd(){
+  kokoAnim('celebrate');
+  const pct=score/items.length;
+  const [em,msg]=pct>=.9?['🌟','Fantastisch!']:pct>=.7?['😄','Sehr gut!']:pct>=.5?['👍','Gut gemacht!']:['🐉','Weiter üben!'];
+  const stars='⭐'.repeat(Math.round(pct*5));
+  document.getElementById('quiz-body').innerHTML=`
+    <span class="end-emoji">${em}</span>
+    <div class="end-title">${msg}</div>
+    <div class="end-stars">${stars}</div>
+    <div class="end-sub">${score} von ${items.length} Fragen richtig</div>
+    <button class="btn-restart" onclick="start()">Nochmal spielen</button>
+  `;
+  document.getElementById('card-footer').textContent=`${score} / ${items.length}`;
+}
+
+function start(){
+  items=rawItems.map(x=>({...x}));
+  shuffle(items);
+  cur=0; score=0; busy=false;
+  setMouth('happy');
+  render();
+}
+
+start();
+</script>
+</body>
+</html>
